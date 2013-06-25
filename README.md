@@ -3,5 +3,5 @@ touch-table-instrument
 
 # Install & Run
 
-  $ npm install
-  $ node index.js
+    $ npm install
+    $ node index.js
