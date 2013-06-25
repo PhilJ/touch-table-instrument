@@ -1,0 +1,17 @@
+{
+  "name": "touch-table-instrument",
+  "version": "0.0.0",
+  "description": "NodeJs project for a LED pixel table which works as a OSC touch controller ",
+  "main": "index.js",
+  "dependencies": {
+    "serialport": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PhilJ/touch-table-instrument.git"
+  },
+  "author": "Philipp Schächtele & Richard Jahner",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "7b4bd2fbd377733b2dd313d4c28d8cdfcdb7145c"
+}
