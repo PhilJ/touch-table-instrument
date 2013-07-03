@@ -61,6 +61,7 @@ serialPort.on("open", function () {
   
     var parsedInput = parseInput(input, inputFormat);
     console.log("Parsed Input", parsedInput);
+    console.log("\n\n\n\n");
     
   });
 });
