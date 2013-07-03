@@ -59,9 +59,9 @@ serialPort.on("open", function () {
       val10: [72, 8]
     };
   
-    var parsedInput = parseInput(input, inputFormat);
+    var parsedInput = parseInput(binaryData, inputFormat);
     console.log("Parsed Input", parsedInput);
-    console.log("\n\n\n\n");
+    console.log("\n\n");
     
   });
 });
