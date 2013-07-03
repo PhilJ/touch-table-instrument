@@ -1,15 +1,33 @@
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
 
+
+function bufferParser () {
+  var delimiter = "\n";
+  // Delimiter buffer saved in closure
+  var data = new Buffer();
+  return function (emitter, buffer) {
+    // Collect data
+    data = Buffer.concat([data, buffer]);
+    
+    var currentChar = buffer.toString();
+    // if current buffer equals an \n buffer is emitted
+    if (currentChat == delimiter) {
+      emitter.emit('data', data);
+      data = new Buffer();
+    }
+  };
+}
+
 // Init UART Serial
 var serialPort = new SerialPort("/dev/ttyAMA0", {
   baudrate: 115200,
   buffersize: 8,
-  parser: splib.parsers.readline('\n')
+  parser: bufferParser
 });
 
 // parses a string of bits by given format
-// @param input  String of Bits, e.g. "00001010011"
+// @param input  Buffer
 // @param format Object with Value containing Start end Length of each value
 // @output Object with calculated values
 function parseInput (input, format) {
@@ -17,21 +35,11 @@ function parseInput (input, format) {
   for (var key in format) {
     if (format.hasOwnProperty(key)) {
       // slice bits out as decribed in format .slice(start, start  + length)
-      var intAsBits = input.slice(format[key][0], format[key][0] + format[key][1]);
+      var intAsBits = input.readUInt8(format[key][0]);
       // parse int and write to output
-      output[key] = parseInt(intAsBits, 2);
+      output[key] = intAsBits;
     }
   } 
-  return output;
-}
-
-// Function to parse string passed by SerialPort to String of Bits (0 & 1)
-function strToBinary (input) {
-  var output = "";
-  for (var i = 0; input.length - 1 >= i; i++) {
-    var charAsInt = input.charCodeAt(i);
-    output += charAsInt.toString(2);
-  }
   return output;
 }
 
@@ -41,9 +49,8 @@ serialPort.on("open", function () {
 
   // On data receive
   serialPort.on('data', function(data) {
-    console.log('data received (as string): ' + data);
-    var binaryData = strToBinary(data);
-    console.log('data received (as binary): ' + binaryData);
+    console.log('data received (as buffer): ' + data);
+   
     // describes name as key and start bit and length. 
     // all values are interpreted as Ints so far
     var inputFormat = {
@@ -59,7 +66,7 @@ serialPort.on("open", function () {
       val10: [72, 8]
     };
   
-    var parsedInput = parseInput(binaryData, inputFormat);
+    var parsedInput = parseInput(data, inputFormat);
     console.log("Parsed Input", parsedInput);
     console.log("\n\n");
     
