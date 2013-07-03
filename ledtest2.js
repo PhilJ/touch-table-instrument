@@ -17,16 +17,15 @@ function PixelController (config) {
 PixelController.prototype.set = function (pixelMatrix) {
     var pixelStrip = [];
   
-    for (var m in mapping) {
-        pixelStrip.push(pixels[ mapping[m][1] ][ mapping[m][0] ]);
+    for (var m in this.mapping) {
+        pixelStrip.push(pixelMatrix[ this.mapping[m][1] ][ this.mapping[m][0] ]);
     }
-    
+    console.log(pixelStrip); 
     for (var p in pixelStrip) {
         this.writeBuffer[ p * 3 ]     = pixelStrip[p].slice(0,2); // red
         this.writeBuffer[ p * 3 + 1 ] = pixelStrip[p].slice(2,4); // green
         this.writeBuffer[ p * 3 + 2 ] = pixelStrip[p].slice(4,6); // blue
     }
-    
     this.device.write(this.writeBuffer, this.readBuffer);
 }
 
@@ -80,7 +79,7 @@ var controller = new PixelController({
     mapping: mapping
 });
 
-/*var pixels = [
+var pixels = [
   ["000000", "111111", "222222", "333333", "444444", "555555"],
   ["888888", "999999", "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD"],
   ["000000", "111111", "222222", "333333", "444444", "555555"],
@@ -88,8 +87,8 @@ var controller = new PixelController({
   ["000000", "111111", "222222", "333333", "444444", "555555"],
   ["888888", "999999", "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD"],
   ["000000", "111111", "222222", "333333", "444444", "555555"]
-];*/
-
+];
+/*
 var pixels = [
   ["FF0000", "FF0000", "FF0000", "FF0000", "FF0000", "FF0000"],
   ["00FF00", "00FF00", "00FF00", "00FF00", "00FF00", "00FF00"],
@@ -99,5 +98,5 @@ var pixels = [
   ["0000FF", "0000FF", "0000FF", "0000FF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "FF0000", "FF0000", "FF0000", "FF0000"]
 ];
-
+*/
 controller.set(pixels);
