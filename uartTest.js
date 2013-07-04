@@ -5,7 +5,7 @@ var SerialPort = splib.SerialPort;
 function bufferParser () {
   var delimiter = "\n";
   // Delimiter buffer saved in closure
-  var data = new Buffer();
+  var data = Buffer(0);
   return function (emitter, buffer) {
     // Collect data
     data = Buffer.concat([data, buffer]);
