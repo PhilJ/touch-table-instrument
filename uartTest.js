@@ -51,8 +51,8 @@ var testEmitter = {
 }
 */
 
-function bufferParser () {
-  var delimiter = Buffer("\n");
+function bufferParser (delimiterStr) {
+  var delimiter = Buffer(delimiterStr);
   // Delimiter buffer saved in closure
   var data = new Buffer(0);
   return function (emitter, buffer) {
@@ -74,7 +74,7 @@ function bufferParser () {
 var serialPort = new SerialPort("/dev/ttyAMA0", {
   baudrate: 9600,
   buffersize: 4,
-  parser: bufferParser()
+  parser: bufferParser("\n")
 });
 
 // parses a string of bits by given format
