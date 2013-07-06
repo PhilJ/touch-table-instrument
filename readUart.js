@@ -40,6 +40,8 @@ function strToBinary (input) {
   return output;
 }
 
+
+
 function test () {
   // get test input from function
   var input = generateTestInput();

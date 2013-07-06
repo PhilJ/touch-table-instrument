@@ -1,33 +1,12 @@
+require('buffertools');
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
 
-Buffer.prototype.indexOf = function (needle) { 
-        if (!(needle instanceof Buffer)) { 
-                needle = new Buffer(needle + ""); 
-        } 
-        var length = this.length, needleLength = needle.length, pos = 0, 
-index; 
-        for (var i = 0; i < length; ++i) { 
-                if (needle[pos] === this[i]) { 
-                        if ((pos + 1) === needleLength) { 
-                            if (index != null) return index;
-                            else return i; 
-                        } else if (pos === 0) { 
-                                index = i; 
-                        } 
-                        ++pos; 
-                } else if (pos) { 
-                        pos = 0; 
-                        i = index; 
-                } 
-        } 
-        return -1; 
-}; 
 
-/* TEST EMITTER
+// TEST EMITTER
 var testEmitter = {
   emit: function(event, data) {
-    console.log('data received (as buffer): ' + data);
+    console.log('data received (as buffer): ', data);
     
     // describes name as key and start bit and length. 
     // all values are interpreted as Ints so far
@@ -49,7 +28,7 @@ var testEmitter = {
     console.log("\n\n");
   }
 }
-*/
+
 
 function bufferParser (delimiterStr) {
   var delimiter = Buffer(delimiterStr);
@@ -71,11 +50,11 @@ function bufferParser (delimiterStr) {
 }
 
 // Init UART Serial
-var serialPort = new SerialPort("/dev/ttyAMA0", {
+/*var serialPort = new SerialPort("/dev/ttyAMA0", {
   baudrate: 9600,
   buffersize: 4,
   parser: bufferParser("\n")
-});
+});*/
 
 // parses a string of bits by given format
 // @param input  Buffer
@@ -99,7 +78,7 @@ function parseInput (input, format) {
   return output;
 }
 
-
+/*
 // Wait on Port open
 serialPort.on("open", function () {
   console.log('UART connected');
@@ -128,10 +107,10 @@ serialPort.on("open", function () {
     console.log("\n\n");
     
   });
-});
+});*/
 
 
-/* TEST CODE
+// TEST CODE
 var testData = [0x00, 0x4d, 0x5b, 0x19, 0x33, 0x19, 0x93, 0x19, 0xbe, 0x19, 0x89, 0x19, 0xd2, 0x19, 0xf2, 0x18, 0xa9, 0x19, 0x5f, 0x35, 0xa4, 0x35, 0x94, 0x35, 0x4d, 0x33, 0xa4, 0x35, 0xc1, 0x33, 0x8f, 0x0a];
 var testBuffer = Buffer("004d5b1933199319be198919d219f218a9195f35a43594354d33a435c1338f0a", "hex");
 
@@ -144,8 +123,8 @@ var testBuffers = [
 ];
 console.log("Buffers: ", testBuffers[0], testBuffers[1]);
 
-var parser = bufferParser();
+var parser = bufferParser("\n");
 for (var i in testBuffers) {
    parser(testEmitter, testBuffers[i]);
 }
-*/
+

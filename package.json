@@ -4,7 +4,8 @@
   "description": "NodeJs project for a LED pixel table which works as a OSC touch controller ",
   "main": "index.js",
   "dependencies": {
-    "serialport": "*"
+    "serialport": "*",
+    "buffertools": "*"
   },
   "repository": {
     "type": "git",
