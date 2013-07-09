@@ -1,8 +1,8 @@
-//var spi = require('spi');
+var spi = require('spi');
 
 function PixelController (config) { 
     this.mapping = config.mapping;
-    //this.device = new spi.Spi(config.deviceName);
+    this.device = new spi.Spi(config.deviceName);
     
     this.pixelCount = this.mapping.length;
     
@@ -11,7 +11,7 @@ function PixelController (config) {
     this.writeBuffer.fill(0);
     this.readBuffer.fill(0);
     
-    //this.device.write(this.writeBuffer, this.readBuffer);
+    this.device.write(this.writeBuffer, this.readBuffer);
 }
 
 PixelController.prototype.set = function (pixelMatrix) {
@@ -20,12 +20,12 @@ PixelController.prototype.set = function (pixelMatrix) {
     for (var m in this.mapping) {
         pixelStrip.push(pixelMatrix[ this.mapping[m][1] ][ this.mapping[m][0] ]);
     }
-    console.log(pixelStrip); 
+    //console.log(pixelStrip); 
     for (var p in pixelStrip) {
         this.writeBuffer.write(pixelStrip[p].slice(0,6), p * 3, 'hex');
     }
-    console.log(this.writeBuffer);
-    //this.device.write(this.writeBuffer, this.readBuffer);
+    //console.log(this.writeBuffer);
+    this.device.write(this.writeBuffer, this.readBuffer);
 }
 
 function createMapping (rows, cols, startX, startY, direction) {

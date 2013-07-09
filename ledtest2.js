@@ -10,7 +10,6 @@ var pixels = new PixelController.PixelController({
     deviceName: ledDevice,
     mapping: PixelController.createMapping(rows, cols, startX, startX, wireingDirection)
 });
-/*
 var input = [
   ["000000", "111111", "222222", "333333", "444444", "555555"],
   ["888888", "999999", "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD"],
@@ -20,7 +19,7 @@ var input = [
   ["888888", "999999", "AAAAAA", "BBBBBB", "CCCCCC", "DDDDDD"],
   ["000000", "111111", "222222", "333333", "444444", "555555"]
 ];
-*/
+/*
 var input = [
   ["FF0000", "FF0000", "FF0000", "FF0000", "FF0000", "FF0000"],
   ["00FF00", "00FF00", "00FF00", "00FF00", "00FF00", "00FF00"],
@@ -30,5 +29,5 @@ var input = [
   ["0000FF", "0000FF", "0000FF", "0000FF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "FF0000", "FF0000", "FF0000", "FF0000"]
 ];
-
+*/
 pixels.set(input);
