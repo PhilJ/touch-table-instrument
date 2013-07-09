@@ -36,7 +36,7 @@ var uartReader = new Uart.UartReader({
 // Init touch event manager
 var touchEvents = new TouchEvents(rows, columns);
 
-var mapping = PixelController.createMapping(rows, columns, startX, startX, wireingDirection);
+var mapping = PixelController.createMapping(rows, columns, startX, startY, wireingDirection);
 mapping.unshift([0,0], [0,0]);
 
 // Init Pixel Controller
