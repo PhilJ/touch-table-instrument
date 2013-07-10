@@ -22,7 +22,7 @@ var inputFormat = {
 
 // Init UART Device
 var device = new SerialPort(uartDevice, {
-  baudRate: 1200,
+  baudRate: 115200,
   bufferSize: 4,
   parser: Uart.rawWithDelimiterParser( Buffer("\n") )
 });
@@ -49,12 +49,12 @@ var ledPixels = new PixelController.PixelController({
 
 // Setup pixel default value
 var input = [
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
+  ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
 ];
 
 var input_white = [
@@ -71,16 +71,17 @@ var input_white = [
 
 // on touch event
 var onTouch = function (event) {
+ 
   // make touched pixel white
   input[event.newState.button.row][event.newState.button.column] = "FFFFFF";
   ledPixels.set(input);
-  console.log("Touch", event.newState.button);
+//  console.log("Touch", event.newState.button);
 }
 // on release event
 var onRelease = function (event) {
   // make released pixel black
-  input[event.newState.button.row][event.oldState.button.column] = "000000";
-  console.log("Release", event.oldState.button);
+  input[event.oldState.button.row][event.oldState.button.column] = "F0000F";
+//  console.log("Release", event.oldState.button);
   ledPixels.set(input);
 }
   
