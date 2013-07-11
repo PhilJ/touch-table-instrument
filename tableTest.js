@@ -8,7 +8,7 @@ var PixelController = require('./PixelController.js');
 
 // configure table 
 var rows = 6, columns = 8;
-var startX = "left", startY = "bottom", wireingDirection = "vertical";
+var startX = "left", startY = "top", wireingDirection = "vertical";
 var ledDevice = '/dev/spidev0.0'; 
 var uartDevice = '/dev/ttyAMA0';
 
@@ -23,14 +23,14 @@ var inputFormat = {
 // Init UART Device
 var device = new SerialPort(uartDevice, {
   baudRate: 115200,
-  bufferSize: 4,
-  parser: Uart.rawWithDelimiterParser( Buffer("\n") )
+  bufferSize: 6,
+  parser: Uart.rawWithDelimiterParser( Buffer("\n\n\n"), 3 )
 });
 
 // Init Uart Reader
 var uartReader = new Uart.UartReader({
-  device: device,
-  inputFormat: inputFormat
+  'device': device,
+  'inputFormat': inputFormat
 });
 
 // Init touch event manager

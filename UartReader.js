@@ -10,27 +10,39 @@ var SerialPort = splib.SerialPort;
   @param delimiter Buffer Buffer with message delimiter bits
   @output Function Returns a parser function
 */
-function rawWithDelimiterParser (delimiter) {
-  var data = new Buffer(0);
+function rawWithDelimiterParser (delimiter, messageLength) {
+  var data = new Buffer(0, "hex");
+  
   return function (emitter, buffer) {
     // Concat cache and buffer
     data = new Buffer.concat([data, buffer]);
     // check if buffer contains delimiter
     var delimiterIndex = data.indexOf(delimiter);
-    if (delimiterIndex != -1) {
+    var shouldBeDelimiter = data.slice(messageLength, messageLength + delimiter.length);
+    
+    //var equal = new Buffer.equal(delimiter, shouldBeDelimiter);
+    console.log(data);
+
+    // data has length of message + delimiter
+    // data is longer then message + delimiter
+    if (delimiter.toString() == shouldBeDelimiter.toString()) {
       // buffer contains delimiter. prepare for output by slicing off everything before delimiter
-      var output = data.slice(0, delimiterIndex);
-      // write everthing after delimiter to cache
-      //console.log(delimiterIndex + delimiter.length, data.length - 1);
-      var start = delimiterIndex + delimiter.length;
-      var end   = data.length - 1;
-      if (start < end) {
-        data = data.slice(start, end);
-      } else {
-        data = new Buffer(0);
-      }
+      var output = data.slice(0, messageLength);
+      
       // emit data
       emitter.emit('data', output);
+      data = new Buffer(0);
+      // write everthing after delimiter to cache
+      //console.log(delimiterIndex + delimiter.length, data.length - 1);
+      
+    } else if (data.length < messageLength + delimiter.length) {  
+      // data shorter then length -> write completly to buffer = do nothing
+      // data = new Buffer(0);
+    } else if (data.length > messageLength + delimiter.length) {
+      // data is longer then expected length -> write everthing behind delimiter to buffer
+      var start = delimiterIndex + delimiter.length;
+      var end   = data.length;
+      data = data.slice(start, end);
     }
   };
 }
