@@ -2,37 +2,25 @@
 
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
-var Uart = require('./UartReader.js');
 var TouchEvents = require("./TouchEvents.js").TouchEvents;
 var PixelController = require('./PixelController.js');
-var Color      = require("color");
+var color = require('onecolor');
 
 // configure table 
 var rows = 6, columns = 8;
 var startX = "left", startY = "top", wireingDirection = "vertical";
 var ledDevice = '/dev/spidev0.0'; 
 var uartDevice = '/dev/ttyAMA0';
-
-// Define Input Mapping
-var inputFormat = {
-  isPressed: [0,1],
-  x: [1,1],
-  y: [2,1]
-};
+var uartMessageDelimiter = "\n\n\n";
 
 
 // Init UART Device
 var device = new SerialPort(uartDevice, {
   baudRate: 115200,
   bufferSize: 6,
-  parser: Uart.rawWithDelimiterParser( Buffer("\n\n\n"), 3 )
+  parser: splib.parsers.readline(uartMessageDelimiter)
 });
 
-// Init Uart Reader
-var uartReader = new Uart.UartReader({
-  'device': device,
-  'inputFormat': inputFormat
-});
 
 // Init touch event manager
 var touchEvents = new TouchEvents(rows, columns);
@@ -67,13 +55,13 @@ var input_white = [
   ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
 ];
 
-var input = [
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"]
+var pixels = [
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
+  ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"]
 ];
 
 
@@ -84,22 +72,28 @@ var onTouch = function (event) {
  
   // make touched pixel white
   //input[event.newState.button.row][event.newState.button.column] = "FFFFFF";
-  //ledPixels.set(input);
+  //ledPixels.set(pixels);
+  //console.log(event);
   
   pressed = true;
   lighten();
   
   function lighten () {
-    if (pressed == true) {
-      var oldColor = input[event.newState.button.row][event.newState.button.column];
-      
-      var newColor = Color(oldColor).lighten().hexString().slice(1,7);
-      console.log(oldColor, newColor);
-      input[event.newState.button.row][event.newState.button.column] = newColor;
-      ledPixels.set(input);
+    //console.log("Pressed: ", pressed);
+    var oldColor = pixels[event.newState.button.row][event.newState.button.column];
+    if (pressed === true) {
+      newColor = color(oldColor);
+      if (newColor.red() == 0) newColor = newColor.green(.05, true);
+      else newColor = newColor.red(.05, true).green(-0.05, true); // (newColor.red() < 1)
+
+      if (newColor.green() == 1) newColor = newColor.red(.05, true);
+      console.log(newColor);
+
+      pixels[event.newState.button.row][event.newState.button.column] = newColor.hex().substr(1,6);
+      ledPixels.set(pixels);
       setTimeout(function () {
         lighten();
-      }, 10);
+      }, 50);
       
     }
   };
@@ -110,7 +104,8 @@ var onRelease = function (event) {
   // make released pixel black
   //input[event.oldState.button.row][event.oldState.button.column] = "F0000F";
 //  console.log("Release", event.oldState.button);
-  //ledPixels.set(input);
+  //ledPixels.set(pixels);
+  //console.log("What a RELEASE!", event.oldState.button)
   pressed = false;
 }
   
@@ -118,10 +113,17 @@ var onlyOnTouch = true;
 touchEvents.subscribeAllButtons(onTouch, onRelease, onlyOnTouch);
 
 // wireup uart reader with event manager
-uartReader.listen(function (data) {
-  //if (typeof data.x == "number" && typeof data.y == "number" && data.x <= 100 && data.y <= 100) {
-    touchEvents.update(data.isPressed, data.x, data.y);
-  //}
+// wireup uart reader with event manager
+device.on('data', function(data) {
+  try {
+    data = JSON.parse(data);
+    //console.log(data);
+    //if (typeof data.x == "number" && typeof data.y == "number" && data.x <= 100 && data.y <= 100) {
+      touchEvents.update(data.isPressed, data.xPos, data.yPos);
+    //}
+  } catch (e) {
+    console.log("Couldn't parse", data, e);
+  }
 });
 
 

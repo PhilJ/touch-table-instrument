@@ -16,7 +16,7 @@ function rawWithDelimiterParser (delimiter, messageLength) {
   return function (emitter, buffer) {
     // Concat cache and buffer
     data = new Buffer.concat([data, buffer]);
-
+    
     // check if buffer contains delimiter
     var delimiterIndex = data.indexOf(delimiter);
     if (data.length >= messageLength + delimiter.length) {
@@ -57,27 +57,30 @@ function rawWithDelimiterParser (delimiter, messageLength) {
 
 function UartReader (config) {
   if (config.device == null) console.log("Missing key 'device' of type SerialPort");
-  //this.deviceName = (config.deviceName != null) ? config.deviceName : '/dev/ttyAMA0';
-  //this.baudRate   = (config.baudRate != null) ? config.baudRate : 9600;
-  //this.bufferSize = (config.bufferSize != null) ? config.bufferSize : 8;
-  //this.messageDelimiter = (config.messageDelimiter && config.messageDelimiter.isBuffer == true) ? config.messageDelimiter : Buffer("\n");
+  // this.deviceName = (config.deviceName != null) ? config.deviceName : '/dev/ttyAMA0';
+  // this.baudRate   = (config.baudRate != null) ? config.baudRate : 115200;
+  // this.bufferSize = (config.bufferSize != null) ? config.bufferSize : 20;
+  // this.messageDelimiter = (config.messageDelimiter && config.messageDelimiter.isBuffer == true) ? config.messageDelimiter : Buffer("\n\n\n");
   this.inputFormat = config.inputFormat ? config.inputFormat : null;
   this.listeners  = [];
   this.device     = config.device;
   
-  /*this.device = new SerialPort(this.deviceName, {
-    baudrate: this.baudRate ,
-    buffersize: bufferSize,
-    parser: rawWithDelimiterParser(this.messageDelimiter)
-  });*/
+  // this.device = new SerialPort(this.deviceName, {
+  //   baudrate: this.baudRate ,
+  //   buffersize: bufferSize,
+  //   parser: rawWithDelimiterParser(this.messageDelimiter)
+  // });
   
   // open serial interface
   var self = this;  
 
   this.device.on('open', function () {
+    console.log('open Serialport')
     // wait for data events
     self.device.on('data', function(message) { 
       // parse data by format
+      console.log('Receiving Data:')
+      console.log(message);
       var parsedInput = self.parseBuffer(message, self.inputFormat);
       // notfiy all listener
       for (var l in self.listeners) {

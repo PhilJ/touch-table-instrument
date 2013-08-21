@@ -2,7 +2,6 @@
 
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
-var Uart = require('./UartReader.js');
 var TouchEvents = require("./TouchEvents.js").TouchEvents;
 var PixelController = require('./PixelController.js');
 var Color      = require("color");
@@ -12,7 +11,6 @@ var rows = 6, columns = 8;
 var startX = "left", startY = "top", wireingDirection = "vertical";
 var ledDevice = '/dev/spidev0.0'; 
 var uartDevice = '/dev/ttyAMA0';
-var uartMessageLength = 5;
 var uartMessageDelimiter = "\n\n\n";
 
 // Define Input Mapping
@@ -28,15 +26,10 @@ var inputFormat = {
 // Init UART Device
 var device = new SerialPort(uartDevice, {
   baudRate: 115200,
-  bufferSize: 6,
-  parser: Uart.rawWithDelimiterParser( Buffer(uartMessageDelimiter), uartMessageLength )
+  bufferSize: 5,
+  parser: splib.parsers.readline(uartMessageDelimiter)
 });
 
-// Init Uart Reader
-var uartReader = new Uart.UartReader({
-  'device': device,
-  'inputFormat': inputFormat
-});
 
 // Init touch event manager
 var touchEvents = new TouchEvents(rows, columns);
@@ -50,7 +43,6 @@ var ledPixels = new PixelController.PixelController({
     mapping: mapping
 });
 
-//console.log(PixelController.createMapping(rows, columns, startX, startX, wireingDirection).unshift());
 
 // Setup pixel default value
 var input = [
@@ -70,15 +62,6 @@ var input_white = [
   ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
   ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
 ];
-
-/*var input = [
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
-  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"]
-];*/
 
 
 var pressed = false;
@@ -125,15 +108,15 @@ var onRelease = function (event) {
  // pressed = false;
 }
   
-var onlyOnTouch = true;
-//touchEvents.subscribeAllButtons(onTouch, onRelease, onlyOnTouch);
+//touchEvents.subscribeAllButtons(onTouch, onRelease);
 
 // wireup uart reader with event manager
-uartReader.listen(function (data) {
-
-  var hex1 = data.prox1.toString(16);
+device.on('data', function(data) {
+  data = JSON.parse(data);
+  console.log(data);
+  var hex1 = data.prox_left_half.toString(16);
   if (hex1.length < 2) hex1 = "0" + hex1;
-  var hex2 = data.prox2.toString(16);
+  var hex2 = data.prox_right_half.toString(16);
   if (hex2.length < 2) hex2 = "0" + hex2;
 
   var color = hex1 + hex2 + "00";
@@ -144,11 +127,11 @@ uartReader.listen(function (data) {
       output[r][c] = color;
     }
   }
-  //console.log(output);
+  //console.log(data.col_raw[7]);
   ledPixels.set(output);
   
   //if (typeof data.x == "number" && typeof data.y == "number" && data.x <= 100 && data.y <= 100) {
-    touchEvents.update(data.isPressed, data.x, data.y);
+    touchEvents.update(data.isPressed, data.xPos, data.yPos);
   //}
 });
 

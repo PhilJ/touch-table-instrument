@@ -67,9 +67,9 @@ TouchEvents.prototype.evaluateButtonListeners = function (newState, oldState) {
   };
   
   // Check for touch and hover events
-  if (newState.isTouched === false) {
+  if (newState.isTouched == false) {
     // table is not touched
-    if (oldState.isTouched === true) {
+    if (oldState.isTouched == true) {
       events.buttonTouchedStop = true; // previously touched button was released
     }
     if (newState.button.row !== null) {
@@ -86,11 +86,12 @@ TouchEvents.prototype.evaluateButtonListeners = function (newState, oldState) {
     }
   } else {
     // table is touched
-    if (oldState.isTouched === false) {
+    if (oldState.isTouched == false) {
       events.buttonTouchedStart = true; // button which was NOT touched before is now touched
-    } else if (newState.button.row === oldState.button.row && newState.button.column === oldState.button.column) {
+    } else if (newState.button.row == oldState.button.row && newState.button.column == oldState.button.column) {
       events.buttonTouchedUpdate = true; // button which was touched is still touched
     } else {
+      console.log("I WAS HERE")
       events.buttonTouchedStart = true; // a new button was touched
       events.buttonTouchedStop = true; // if a new button was touched, the old must be released
     }
@@ -102,9 +103,6 @@ TouchEvents.prototype.evaluateButtonListeners = function (newState, oldState) {
     oldState: oldState
   };
     
-  // trigger button events
-  this.triggerButtonTouchEvents(this.buttonListeners[newState.button.row][newState.button.column], eventObject);
-  this.triggerButtonTouchEvents(this.allButtonListeners, eventObject);
   
   // trigger release button release
   if (oldState.button.row != null && oldState.button.column != null) {
@@ -112,6 +110,9 @@ TouchEvents.prototype.evaluateButtonListeners = function (newState, oldState) {
     this.triggerButtonReleaseEvents(this.allButtonListeners, eventObject);
   }
 
+  // trigger button events
+  this.triggerButtonTouchEvents(this.buttonListeners[newState.button.row][newState.button.column], eventObject);
+  this.triggerButtonTouchEvents(this.allButtonListeners, eventObject);
 };
 
 // trigger press button event
@@ -171,14 +172,14 @@ TouchEvents.prototype.evaluateRowListeners = function (newState, oldState) {
   };
   
   // Check for touch and hover events
-  if (newState.isTouched === false) {
+  if (newState.isTouched == false) {
     // table is not touched
-    if (oldState.isTouched === true) {
+    if (oldState.isTouched == true) {
       events.rowTouchedStop = true; // previously touched row was released
     }
     if (newState.row != null) {
       // calculate hovered button presses
-      if (newState.row === oldState.row) {
+      if (newState.row == oldState.row) {
         events.rowHoveredUpdate = true; // row which was hovered before is still hovered
       } else {
         events.rowHoveredStart = true; // a new row was hovered
@@ -190,9 +191,9 @@ TouchEvents.prototype.evaluateRowListeners = function (newState, oldState) {
     }
   } else {
     // table is touched
-    if (oldState.isTouched === false) {
+    if (oldState.isTouched == false) {
       events.rowTouchedStart = true; // row which was NOT touched before is now touched
-    } else if (newState.button.row === oldState.button.row) {
+    } else if (newState.button.row == oldState.button.row) {
       events.rowTouchedUpdate = true; // button which was touched is still touched
     } else {
       events.rowTouchedStart = true; // a new button was touched

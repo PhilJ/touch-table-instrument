@@ -22,6 +22,7 @@ PixelController.prototype.set = function (pixelMatrix) {
     }
     //console.log(pixelStrip); 
     for (var p in pixelStrip) {
+        //console.log(p);
         this.writeBuffer.write(pixelStrip[p].slice(0,6), p * 3, 'hex');
     }
     //console.log(this.writeBuffer);
