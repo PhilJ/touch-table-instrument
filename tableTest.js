@@ -2,7 +2,7 @@
 
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
-var TouchEvents = require("./TouchEvents.js").TouchEvents;
+var MultiTouchEventManager = require("./MultiTouchEventManager.js").MultiTouchEventManager;
 var PixelController = require('./PixelController.js');
 var color = require('onecolor');
 
@@ -23,7 +23,7 @@ var device = new SerialPort(uartDevice, {
 
 
 // Init touch event manager
-var touchEvents = new TouchEvents(rows, columns);
+var touchEvents = new MultiTouchEventManager({rows: rows, columns: columns});
 
 var mapping = PixelController.createMapping(rows, columns, startX, startY, wireingDirection);
 mapping.unshift([0,0], [0,0]);
@@ -68,59 +68,31 @@ var pixels = [
 var pressed = false;
 
 // on touch event
-var onTouch = function (event) {
- 
-  // make touched pixel white
-  //input[event.newState.button.row][event.newState.button.column] = "FFFFFF";
-  //ledPixels.set(pixels);
-  //console.log(event);
-  
-  pressed = true;
-  lighten();
-  
-  function lighten () {
-    //console.log("Pressed: ", pressed);
-    var oldColor = pixels[event.newState.button.row][event.newState.button.column];
-    if (pressed === true) {
-      newColor = color(oldColor);
-      if (newColor.red() == 0) newColor = newColor.green(.05, true);
-      else newColor = newColor.red(.05, true).green(-0.05, true); // (newColor.red() < 1)
-
-      if (newColor.green() == 1) newColor = newColor.red(.05, true);
-      console.log(newColor);
-
-      pixels[event.newState.button.row][event.newState.button.column] = newColor.hex().substr(1,6);
-      ledPixels.set(pixels);
-      setTimeout(function () {
-        lighten();
-      }, 50);
-      
-    }
-  };
-//  console.log("Touch", event.newState.button);
+var onTouch = function (status) {
+  status.buttonPressedNew.forEach(function (element, index) {
+    pixels[element.x][element.y] = 'FFFFFF';
+  });
+  ledPixels.set(pixels);
 }
+
 // on release event
 var onRelease = function (event) {
-  // make released pixel black
-  //input[event.oldState.button.row][event.oldState.button.column] = "F0000F";
-//  console.log("Release", event.oldState.button);
-  //ledPixels.set(pixels);
-  //console.log("What a RELEASE!", event.oldState.button)
-  pressed = false;
+  status.buttonPressedNew.forEach(function (element, index) {
+    pixels[element.x][element.y] = '000000';
+  });
+  ledPixels.set(pixels);
 }
   
 var onlyOnTouch = true;
-touchEvents.subscribeAllButtons(onTouch, onRelease, onlyOnTouch);
+touchEvents.subscribe({all:true}, onTouch, onRelease);
 
 // wireup uart reader with event manager
 // wireup uart reader with event manager
 device.on('data', function(data) {
   try {
     data = JSON.parse(data);
-    //console.log(data);
-    //if (typeof data.x == "number" && typeof data.y == "number" && data.x <= 100 && data.y <= 100) {
-      touchEvents.update(data.isPressed, data.xPos, data.yPos);
-    //}
+    touchEvents.update(data.isPressed);
+
   } catch (e) {
     console.log("Couldn't parse", data, e);
   }
