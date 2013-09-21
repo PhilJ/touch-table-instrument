@@ -2,8 +2,8 @@
 
 var splib      = require("serialport");
 var SerialPort = splib.SerialPort;
-var TouchEvents = require("./TouchEvents.js").TouchEvents;
-var PixelController = require('./PixelController.js');
+var MultiTouchEventManager = require("../lib/MultiTouchEventManager.js").MultiTouchEventManager;
+var PixelController = require('../lib/PixelController.js');
 var Color      = require("color");
 
 // configure table 
@@ -32,7 +32,7 @@ var device = new SerialPort(uartDevice, {
 
 
 // Init touch event manager
-var touchEvents = new TouchEvents(rows, columns);
+var touchEvents = new MultiTouchEventManager({rows: rows, columns: columns});
 
 var mapping = PixelController.createMapping(rows, columns, startX, startY, wireingDirection);
 mapping.unshift([0,0], [0,0]);
@@ -67,16 +67,18 @@ var input_white = [
 var pressed = false;
 
 // on touch event
-var onTouch = function (event) {
+var onTouch = function (state) {
  
 //   make touched pixel white
 //var row_temp = event.newState.button.row;
 //var col_temp = event.newState.button.column;
 //console.log(row_temp, col_temp);
+  state.buttonsPressedNew.forEach(function (element, index) {
 
-  input[event.newState.button.row][event.newState.button.column] = "FFFFFF";
-//  input[row_temp + 1][col_temp +1] = "AAAAAA";
-  ledPixels.set(input);
+    input[element.y][element.x] = "FFFFFF";
+  //  input[row_temp + 1][col_temp +1] = "AAAAAA";
+    ledPixels.set(input);
+  });
   
   /*pressed = true;
   lighten();
@@ -100,21 +102,24 @@ var onTouch = function (event) {
 
 
 // on release event
-var onRelease = function (event) {
+var onRelease = function (state) {
 //   make released pixel pink
-  input[event.oldState.button.row][event.oldState.button.column] = "7CFC00";
-//  console.log("Release", event.oldState.button);
-  ledPixels.set(input);
+  state.buttonsPressedNew.forEach(function (element, index) {
+
+    input[element.y][element.x] = "7CFC00";
+  //  console.log("Release", event.oldState.button);
+    ledPixels.set(input);
+  });
  // pressed = false;
-}
+};
   
-//touchEvents.subscribeAllButtons(onTouch, onRelease);
+touchEvents.subscribe({all: true} , onTouch, onRelease);
 
 // wireup uart reader with event manager
 device.on('data', function(data) {
   data = JSON.parse(data);
   console.log(data);
-  var hex1 = data.prox_left_half.toString(16);
+  /*var hex1 = data.prox_left_half.toString(16);
   if (hex1.length < 2) hex1 = "0" + hex1;
   var hex2 = data.prox_right_half.toString(16);
   if (hex2.length < 2) hex2 = "0" + hex2;
@@ -126,12 +131,12 @@ device.on('data', function(data) {
     for (var c = 0; c < columns; c++) {
       output[r][c] = color;
     }
-  }
+  }*/
   //console.log(data.col_raw[7]);
-  ledPixels.set(output);
+  //ledPixels.set(output);
   
   //if (typeof data.x == "number" && typeof data.y == "number" && data.x <= 100 && data.y <= 100) {
-    touchEvents.update(data.isPressed, data.xPos, data.yPos);
+    touchEvents.update(data.isPressed);
   //}
 });
 

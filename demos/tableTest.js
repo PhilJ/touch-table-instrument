@@ -1,10 +1,11 @@
 // This script should always light the led under the touched button
 
 var splib      = require("serialport");
-var SerialPort = splib.SerialPort;
-var MultiTouchEventManager = require("./MultiTouchEventManager.js").MultiTouchEventManager;
-var PixelController = require('./PixelController.js');
 var color = require('onecolor');
+var SerialPort = splib.SerialPort;
+var MultiTouchEventManager = require("../lib/MultiTouchEventManager.js").MultiTouchEventManager;
+var PixelController = require('../lib/PixelController.js');
+
 
 // configure table 
 var rows = 6, columns = 8;
@@ -46,40 +47,52 @@ var ledPixels = new PixelController.PixelController({
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
 ];*/
 
-var input_white = [
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
-  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+var pixels = [
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"],
+  ["000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000"]
 ];
 
-var pixels = [
+/*var pixels = [
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+  ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+];*/
+
+/*var pixels = [
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"],
   ["00000F", "00000F", "0000F0", "0000F0", "000000", "000000", "000000", "000000"]
-];
+];*/
 
 
 var pressed = false;
 
 // on touch event
 var onTouch = function (status) {
-  status.buttonPressedNew.forEach(function (element, index) {
-    pixels[element.x][element.y] = 'FFFFFF';
+  status.buttonsPressedNew.forEach(function (element, index) {
+    pixels[element.y][element.x] = 'FFFFFF';
   });
+
+  //console.log("TOUCH", status, pixels);
   ledPixels.set(pixels);
 }
 
 // on release event
-var onRelease = function (event) {
-  status.buttonPressedNew.forEach(function (element, index) {
-    pixels[element.x][element.y] = '000000';
+var onRelease = function (status) {
+  status.buttonsReleased.forEach(function (element, index) {
+    pixels[element.y][element.x] = '000000';
   });
+  //console.log("RELEASE", status, pixels);
   ledPixels.set(pixels);
 }
   
@@ -89,13 +102,13 @@ touchEvents.subscribe({all:true}, onTouch, onRelease);
 // wireup uart reader with event manager
 // wireup uart reader with event manager
 device.on('data', function(data) {
-  try {
+  //try {
+    console.log(data);
     data = JSON.parse(data);
     touchEvents.update(data.isPressed);
-
-  } catch (e) {
-    console.log("Couldn't parse", data, e);
-  }
+  //} catch (e) {
+    //console.log("Couldn't parse", data, e);
+  //}
 });
 
 
