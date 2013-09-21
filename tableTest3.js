@@ -37,14 +37,14 @@ var ledPixels = new PixelController.PixelController({
 //console.log(PixelController.createMapping(rows, columns, startX, startX, wireingDirection).unshift());
 
 // Setup pixel default value
-var pixels = [
+/*var input = [
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
   ["FF0000", "FF0000", "00FF00", "FFFF00", "FFFF00", "00FFFF", "0000FF", "0000FF"],
-];
+];*/
 
 var input_white = [
   ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
@@ -55,17 +55,23 @@ var input_white = [
   ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
 ];
 
-// var pixels = [
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
-//   ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"]
-// ];
+var pixels = [
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"],
+  ["00000F", "0000A0", "0000C0", "0000F0", "0000F0", "0000C0", "0000A0", "00000F"]
+];
 
+ 
 var direction = true;
 var pressed = false;
+var checkArray = new Array(6);
+  for (var i = 0; i < checkArray.length; ++i) {
+    checkArray[i] = new Array(8);
+  }
+var allRed = false;
 
 // on touch event
 var onTouch = function (event) {
@@ -74,10 +80,6 @@ var onTouch = function (event) {
   //input[event.newState.button.row][event.newState.button.column] = "FFFFFF";
   //ledPixels.set(pixels);
   //console.log(event);
-
-  // store coordinates to check for button change
-  var originalRow    = event.newState.button.row;
-  var originalColumn = event.newState.button.column;
   
   pressed = true;
   lighten();
@@ -85,9 +87,7 @@ var onTouch = function (event) {
   function lighten () {
     //console.log("Pressed: ", pressed);
     var oldColor = pixels[event.newState.button.row][event.newState.button.column];
-    // repeat method if button is pressed and was not changed
-    if (pressed == true && originalRow == event.newState.button.row && originalColumn == event.newState.button.column) {
-      
+    if (pressed === true) {
       newColor = color(oldColor);
       if (newColor.red() == 0) direction = true;
       else if (newColor.red() == 1) direction = false;
@@ -102,8 +102,8 @@ var onTouch = function (event) {
       }
 
       else {
-        newColor = newColor.red(-0.05, true).blue(0.05, true);
-       // console.log('else');
+        //newColor = newColor.red(-0.05, true).blue(0.05, true);
+        //console.log('else');
       }
       //if (newColor.green() == 1) newColor = newColor.red(.05, true);
       //console.log(newColor);
@@ -127,7 +127,34 @@ var onRelease = function (event) {
   //console.log("What a RELEASE!", event.oldState.button)
   pressed = false;
 
-}
+  checkAll();
+
+  //Set Check = 1 if all LEDs are red
+  function checkAll () {
+
+    for(var i = 0; i < checkArray.length; ++i) {
+      for (var j = 0; j < checkArray[i].length; ++j) {
+        if (color(pixels[i][j]).red() == 1) {
+          checkArray[i][j] = true;
+
+        }
+        else checkArray[i][j] = false;
+      }
+      
+    }
+    
+    console.log(checkArray);
+
+    console.log(checkArray.every(Boolean));
+      //checkArray.every(function(checkArray)); {
+    // return checkArray.every(Boolean)
+    // });
+
+    };
+      
+  
+
+};
   
 var onlyOnTouch = true;
 touchEvents.subscribeAllButtons(onTouch, onRelease, onlyOnTouch);
@@ -145,6 +172,8 @@ device.on('data', function(data) {
     console.log("Couldn't parse", data, e);
   }
 });
+
+
 
 
 

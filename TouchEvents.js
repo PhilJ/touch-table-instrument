@@ -91,7 +91,7 @@ TouchEvents.prototype.evaluateButtonListeners = function (newState, oldState) {
     } else if (newState.button.row == oldState.button.row && newState.button.column == oldState.button.column) {
       events.buttonTouchedUpdate = true; // button which was touched is still touched
     } else {
-      console.log("I WAS HERE")
+      //console.log("I WAS HERE")
       events.buttonTouchedStart = true; // a new button was touched
       events.buttonTouchedStop = true; // if a new button was touched, the old must be released
     }
