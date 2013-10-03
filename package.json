@@ -6,7 +6,11 @@
   "dependencies": {
     "serialport": "*",
     "buffertools": "*",
-    "onecolor": "~2.3.4"
+    "onecolor": "~2.3.4",
+    "ndarray": "~1.0.8",
+    "zeros": "0.0.0",
+    "ndarray-ops": "~1.1.1",
+    "ndarray-fill": "~0.1.0"
   },
   "repository": {
     "type": "git",
