@@ -1,18 +1,9 @@
-var splib      = require("serialport");
-var SerialPort = splib.SerialPort;
+'use strict';
 
-var serialPort = new SerialPort("/dev/ttyAMA0", {
-  baudrate: 9600,
-  buffersize: 8,
-  parser: splib.parsers.readline('\n')
+var TouchTableController = require('./lib/TouchTableController.js');
+
+var touchTable = new TouchTableController({
+	size: [6,8], 
+	fps: 3,
+	port: 3000
 });
-
-serialPort.on("open", function () {
-  console.log('open');
-  serialPort.on('data', function(data) {
-    console.log('data received: ' + data);
-    //console.log(parseInt(data, 16).toString(2) );
-    console.log(typeof data);
-  });  
-});
-

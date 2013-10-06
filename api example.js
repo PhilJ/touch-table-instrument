@@ -58,3 +58,21 @@ touchTable.shape('fade', function () {
 		}
 	}; 
 });
+
+/*Richards Beispiel*/
+
+tixel_tisch = new Tixel(6,8,'FFFFFFFF');
+
+tixel_tisch.backgroundColor('AAAAAA');
+
+tixel_tisch.selection({
+	shape: 'circle', 
+	origin: [2,5],
+	size: 3
+).fade('fancy');
+
+tixel_tisch.selection('circle',2,5,'size',3)
+
+Tixel.prorotype.off = function() {
+	Pixel_aus();
+}

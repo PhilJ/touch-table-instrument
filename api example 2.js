@@ -1,78 +1,84 @@
 
 
 // index.js
-var size = [8,6]
 
 var controller = TableController({
-	size: size,
-	modules: ['touchDemo'],
+	size: [8,6],
+	module: 'touchDemo',
 	fps: 25
 });
 
 // TouchTableController.js
-function TouchTableController () {
-	this.controller = new TixelController();
+function TouchTableController (config) {
 
 	// Init input (server, touch) and output (server, leds)
-	this.server = TableServerView({
+	var server = TableServerView({
 		size: size,
 		port: 9000
 	});
 
-	this.leds = TableLedView({
+	var leds = TableLedView({
 		size: size,
 		device: ''
 	});
 
-	this.touch = TableTouchInput({
+	var touchController = TableTouchInput({
 		device: ''
 	});
 
-	// Wire up rendering
-	this.controller.events.on('render',function (data) {
+
+	// Init pixel controller
+	var tixelController = new TixelController({
+		fps: config.fps,
+		size: config.size,
+		input: touchController
+	});
+
+	// Update LEDs and web clients on render
+	tixelController.events.on('render',function (data) {
 		server.update(data);
 		led.update(data);
 	});
 
-	// Wire up touch
-	this.server.onTouch(function (data) {
-		this.controller.events.emit('touch', data);
+
+	// allow one module to load another by triggering event
+	tixelController.events.on('loadModule', function (name) {
+		tixelController.startModule(name);
 	});
-	this.touch.onTouch(function (data) {
-		this.controller.controller.emit('touch', data);
-	});
+
+	// start first module
+	tixelController.startModule(config.module);
 }
 
-// TixelController.js: Provides input und render listeners for Tixel
-function TixelController () {
-	this.events = EventEmitter();
-}
 
-TableController.prototype.startModule = function (name) {
-	// make sure module is loaded an accessible
-	this.tixel = new TixelElement(size);
-	try {
-		var currentModule = require('name');
-		this.module = new currentModule(this, tixel);
-	} catch (e) {
-		console.log('Failed loading module ' + name);
-	}
-	
-}
 
-TableController.prototype.loop = function () {
-	var pixels = this.tixel.render();
-	this.events.emit('render', pixels);
-	var time = this.timeToNextLoop();
-	var self = this;
-	setTimeout(function () {
-		self.loop();
-	}, time);
-};
+// TixelController.js
+
+// LedView.js
+
+// WebView.js
 
 // modules/touchDemo.js
+// 
+// Events:
+//  - touch.update               { touchMatrix: [ [ 0, 1, 0 ... ], ...], 
+//  							   buttonsPressed: [], 
+//  							   buttonsPressedNew: [], 
+//  							   buttonsReleased: [] 
+//  							 }
+//  							   
+//  - touch.touch                { buttonsPressedNew: [ [x, y], ... ] }
+//  - touch.touch.button.x-y
+//  - touch.touch.row.y
+//  - touch.touch.column.x
+//  - touch.release              { buttonsReleased: [ [x, y], ... ] }
+//  - touch.release.button.x-y
+//  - proximity.update
+//  - proximity.update.button.x-y
+//  - input.events.trigger
+//  
 function touchDemo (controller, tixel) {
-	controller.onTouch(function (e) {
+	controller.events.on('touch.touch', function (e) {
 		e.touchedPixelsNew.forEach(function (position) {
 			tixel.selectAt(position);
 		});

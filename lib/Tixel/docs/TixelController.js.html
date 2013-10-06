@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: TixelController.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: TixelController.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>var EventEmitter = require('events').EventEmitter,
+	TixelElement = require('./TixelElement.js'),
+	type = require('./utils.js').type;
+
+
+/**
+ * TixelController provides a loop for TixelElement rendering
+ * and events to bind input events (e.g. touch) and render events
+ * which can be bound to a view (e.g. led matrix or website).
+ *
+ * The loop keeps input events, like touch in sync with rendering.
+ * At the beginning of each loop updateState(this.events) is called on 
+ * each input controller to trigger input events, e.g. 'touch', at the 
+ * passed EventEmitter. In case the state of the input controller, e.g.
+ * the touch controller was changed multiple times since last loop, these states
+ * get evaluated not before `updateState()` is triggered. When called the
+ * input controller triggeres its touch events at this.events and can
+ * be subscribed to by the tixel modules. 
+ *
+ * @example
+ *   // Initialize and start loop of pixel controller with 30 frames
+ * 	 var controller = new TixelController({
+ * 	 	fps: 30,
+ * 	 	input: new MultiTouchController()
+ * 	 });
+ * 	 controller.loadModule('touchDemo');
+ * 	 controller.start();
+ *
+ * @constructor
+ * @param {object}   config        Configuration object
+ * @param {number}   config.fps    Frames per second, default: 30
+ * @param {array}    config.input  Array of input controllers
+ * @param {object}   config.input  Single input controller, e.g. touch controller
+ * @param {function} config.input.updateState Input controller must provide a method 
+ *                                 updateState(), which returns state of controller and 
+ *                                 triggers objects
+ *
+ * @property {number}       fps    Frames per second which is achived for rendering
+ * @property {boolean}      run    Is true, when loop is currently running
+ * @property {EventEmitter} events EventEmitter for render and touch events
+ * @property {object}       inputControllers Array of input controllers, which are triggered each loop to update their state
+ * @property {object}       output Cached output of the last render event
+ * @property {TixelElement} tixel  Tixel element which is changed by module and used for rendering
+ */
+function TixelController (config) {
+	this.fps = (type(config.fps) === 'number') ? fps : 30;
+	this.inputControllers = (type(config.input) === 'array') ? config.input : [];
+	if (type(config.input) === 'object') {
+		inputControllers.push(config.input);
+	}
+	this.run = false;
+	this.events = EventEmitter();
+	this.inputs  = {};
+	this.output = null;
+	this.tixel = null;
+	this.size;
+}
+
+/**
+ * Start tixel module, which will listen to input events and changes
+ * the passed tixel element, which is used for rendering. 
+ *
+ * The module must be a function, which receives this object
+ * as the first, and a plain TixelElement as second parameter.
+ * The element can listen to input events at the passed instance of
+ * this object and change the TixelElement based on this events. 
+ * 
+ * @param  {function} module Path to module
+ */
+TixelController.prototype.startModule = function (module) {
+	// make sure module is loaded an accessible
+	this.tixel = new TixelElement(this.size);
+	try {
+		this.module = new module(this, this.tixel);
+		this.start();
+	} catch (e) {
+		console.log('Failed starting module ' + name);
+		console.log(e);
+	}
+	
+}
+
+/**
+ * Main loop, retriggers automatically by given frame rate. 
+ * Call start() to start and stop() to stop loop
+ *
+ * @fires TixelController#render
+ */
+TixelController.prototype.loop = function () {
+	if (this.run !== true) return;
+
+	this.requestInputs();
+	var time = this.timeToNextLoop();
+	var self = this;
+	setTimeout(function () {
+
+		/** 
+		 * @event TixelController#render
+	     * @type {object}
+	     * @property {array} matrix Pixel matrix  
+		 */
+		
+		this.output = this.tixel.render(this.inputs);
+		self.events.emit('render', this.output);
+		self.loop();
+	}, time);
+};
+
+/**
+ * Stops loop
+ */
+TixelController.prototype.stop = function () {
+	this.run = false;
+};
+
+/**
+ * Starts loop
+ */
+TixelController.prototype.stop = function () {
+	this.run = true;
+	this.loop();
+};
+
+TixelController.prototype.requestInput = function () {
+	this.inputs = {};
+	 this.inputControllers.forEach(function (controller) {
+		// Tell the input controllers (eg. touch controller) to update their state 
+		// and trigger their events
+		var input = controller.updateState(this.events);
+		this.inputs[ controller.name ] = input;
+	});
+};
+
+
+
+module.exports = TixelController;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="TixelController.html">TixelController</a></li><li><a href="TixelElement.html">TixelElement</a></li><li><a href="TixelSelection.html">TixelSelection</a></li></ul><h3>Events</h3><ul><li><a href="TixelController.html#event:render">render</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Tixel">Tixel</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sun Oct 06 2013 04:02:38 GMT+0200 (MESZ)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
