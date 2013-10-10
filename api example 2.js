@@ -51,13 +51,6 @@ function TouchTableController (config) {
 }
 
 
-
-// TixelController.js
-
-// LedView.js
-
-// WebView.js
-
 // modules/touchDemo.js
 // 
 // Events:
@@ -86,4 +79,3 @@ function touchDemo (controller, tixel) {
 		tixel.fadeValue(0,1,25);
 	});
 }
-touchDemo.prototype = new TableModule();

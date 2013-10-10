@@ -1,8 +1,62 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  var socket = io.connect('http://localhost:3000');
-  socket.on('render', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-</script>
+<!DOCTYPE html>
+<html ng-app="TouchTable">
+<head>
+	<title>Touch Table Web Client</title>
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+	<script src="http://code.angularjs.org/1.2.0-rc.2/angular.js"></script>
+	<script src="http://code.angularjs.org/1.2.0-rc.2/angular-touch.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/scripts/app.js"></script>
+	<style type="text/css">
+		body {
+			text-align: center;
+			margin: auto;
+			background: yellow;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+
+		.matrix {
+			margin: 15px auto;
+			padding: 14px;
+			background: rgba(0,0,0,0.3);
+			box-shadow: inset 0 0 7px 2px rgba(255,255,255,0.5), inset 0 0 7px 15px rgba(0,0,0,0.3), inset 0 0 7px 17px rgba(255,255,255,0.5);
+			border: 1px solid rgba(0,0,0,0.1);
+		}
+
+		.row {
+			font-size: 0;
+		} 
+
+		.pixel {
+			width: 30px;
+			height: 30px;
+			display: inline-block;
+			box-shadow: inset 0 0 2px 2px rgba(0,0,0,1), inset 0 0 30px 15px rgba(155,155,155,0.15);
+		}
+	</style>
+</head>
+<body ng-controller="TouchTableController">
+
+	<div class="matrix" style="width: {{ pixelSize * size[1] }}px">
+		<div class="row" ng-repeat="row in pixels track by $index">
+			<div class="pixel" 
+				 ng-repeat="color in row track by $index" 
+				 style="background: #{{color}}; height: {{ pixelSize }}px; width: {{ pixelSize }}px"
+				 ng-click="touchButton([$index, $parent.$index])"
+				 ng-mouseup="releaseButton([$index, $parent.$index])"
+			>
+			</div>
+		</div>
+	</div>
+
+	<a href="#" ng-click="touchButton()">Touch</a>
+
+	
+
+</body>
+</html>
