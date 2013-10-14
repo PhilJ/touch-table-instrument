@@ -3,7 +3,7 @@
 var TouchTableController = require('./lib/TouchTableController.js');
 
 var touchTable = new TouchTableController({
-	size: [6,8], 
+	size: [8,6], 
 	fps: 25,
 	port: 3000
 });
