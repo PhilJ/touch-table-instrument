@@ -6,7 +6,9 @@ function touchTest (controller, tixel) {
 		e.buttonsPressedNew.forEach(function (position) {
 			tixel.selectAt(position);
 		});
-		tixel.setSelectedPixels('FFFFFF');
+        var fade = ['111111','222222','333333','444444','555555','666666','777777','888888',
+        '999999','AAAAAA','BBBBBB','CCCCCC','EEEEEE','FFFFFF']
+		tixel.setSelectedPixels(fade);
 	});
 
 	controller.events.on('touch.release', function (e) {
