@@ -14,7 +14,8 @@
     "express": "~3.4.1",
     "socket.io": "~0.9.16",
     "cwise": "~0.4.0",
-    "ndarray-unpack": "0.0.0"
+    "ndarray-unpack": "0.0.0",
+    "chroma-js": "~0.5.2"
   },
   "repository": {
     "type": "git",
