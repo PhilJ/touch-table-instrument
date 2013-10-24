@@ -15,7 +15,8 @@
     "socket.io": "~0.9.16",
     "cwise": "~0.4.0",
     "ndarray-unpack": "0.0.0",
-    "chroma-js": "~0.5.2"
+    "chroma-js": "~0.5.2",
+    "ndarray-pack": "~1.0.1"
   },
   "repository": {
     "type": "git",
