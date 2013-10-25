@@ -7,16 +7,16 @@ function tixelTest (controller, tixel) {
 	tixel.selectAll().setSelectedPixels('000000');
 
 	var block = new TixelElement({
-		size: [2,2],
-		defaultColor: 'B700F1'
+		size: [1,1],
+		defaultColor: 'FF0000'
 	});
 	block.origin = [1,1];
-	block.opacity.set(0,0,0.5);
+	block.opacity.set(0,0,1);
 
 	tixel.childElements.push(block);
 
 	var line = new TixelElement({
-		size: [1,5],
+		size: [1,6],
 		defaultColor: '0AFF00'
 	});
 	line.origin = [2,0];
@@ -24,18 +24,71 @@ function tixelTest (controller, tixel) {
 	line.opacity.set(0,1,0.4);
 	line.opacity.set(0,2,0.6);
 	line.opacity.set(0,3,0.8);
+	line.opacity.set(0,4,0.8);
 
 	tixel.childElements.push(line);
 
-	/*var direction = 0;
-	controller.events.on('touch.update', function (e) {
-		if (direction === 0) child.origin[0]++;
-		if (direction === 1) child.origin[0]--;
+	var line2 = new TixelElement({
+		size: [1,6],
+		defaultColor: 'FF0000'
+	});
+
+	line2.origin = [5,0];
+	line2.opacity.set(0,0,0.2);
+	line2.opacity.set(0,1,0.4);
+	line2.opacity.set(0,2,0.6);
+	line2.opacity.set(0,3,0.8);
+	line2.opacity.set(0,4,0.8);
+	line2.opacity.set(0,5,0.9);
+
+	tixel.childElements.push(line2);
 
 
-		if (child.origin[0] == 0) direction = 0;
-		if (child.origin[0] == tixel.size[0] - 1) direction = 1;
-	});*/
+	tixel.selectAll().setSelectedPixels('0000AA');
+
+	controller.events.on('touch.touch', function (e) {
+		var target = e.buttonsPressedNew[0];
+
+		var moveX = target[0] - block.origin[0];
+		var moveY = target[1] - block.origin[1];
+
+		move();
+		function update (e) {
+			if (move() === false) {
+				controller.events.removeListener('touch.update', update);
+			}
+		}
+		controller.events.on('touch.update', update);
+
+		function move() {
+			if (moveX !== 0 || moveY !== 0) {
+				if (moveX < 0) {
+					// move left
+					block.origin[0]--;
+					moveX++;
+				}
+				if (moveX > 0) {
+					// move right
+					block.origin[0]++;
+					moveX--;
+				}
+
+				if (moveY < 0) {
+					// move up
+					block.origin[1]--;
+					moveY++;
+				}
+				if (moveY > 0) {
+					// move down
+					block.origin[1]++;
+					moveY--;
+				}
+				return true;
+			}
+			return false;
+		}
+		
+	});
 
 
 
