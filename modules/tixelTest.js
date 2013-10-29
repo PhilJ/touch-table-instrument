@@ -10,22 +10,22 @@ function tixelTest (controller, tixel) {
 		size: [2,2],
 		defaultColor: 'B700F1'
 	});
-	block.origin = [1,1];
-	block.opacity.set(0,0,0.5);
+	block.position = [1,1];
+	block.mask.set(0,0,0.5);
 
-	tixel.childElements.push(block);
+	tixel.children.push(block);
 
 	var line = new TixelElement({
 		size: [1,5],
 		defaultColor: '0AFF00'
 	});
-	line.origin = [2,0];
-	line.opacity.set(0,0,0.2);
-	line.opacity.set(0,1,0.4);
-	line.opacity.set(0,2,0.6);
-	line.opacity.set(0,3,0.8);
+	line.position = [2,0];
+	line.mask.set(0,0,0.2);
+	line.mask.set(0,1,0.4);
+	line.mask.set(0,2,0.6);
+	line.mask.set(0,3,0.8);
 
-	tixel.childElements.push(line);
+	tixel.children.push(line);
 
 	/*var direction = 0;
 	controller.events.on('touch.update', function (e) {
