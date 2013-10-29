@@ -16,7 +16,8 @@
     "cwise": "~0.4.0",
     "ndarray-unpack": "0.0.0",
     "chroma-js": "~0.5.2",
-    "ndarray-pack": "~1.0.1"
+    "ndarray-pack": "~1.0.1",
+    "easing": "0.0.4"
   },
   "repository": {
     "type": "git",

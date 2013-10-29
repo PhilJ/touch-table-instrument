@@ -33,27 +33,27 @@ function pong (controller, tixel) {
 		size: [1,1],
 		defaultColor: green
 	});
-	ball.origin = [4,3];
+	ball.position = [4,3];
 	ball.selectAll().setSelectedPixels(green);
 
 	var pad1 = new TixelElement({
 		size: [1,3],
 		defaultColor: green
 	});
-	pad1.origin = [0,2];
+	pad1.position = [0,2];
 	pad1.selectAll().setSelectedPixels(green);
 
 	var pad2 = new TixelElement({
 		size: [1,3],
 		defaultColor: green
 	});
-	pad2.origin = [7,2];
+	pad2.position = [7,2];
 	pad2.selectAll().setSelectedPixels(green);
 
 
-	tixel.childElements.push(ball);
-	tixel.childElements.push(pad1);
-	tixel.childElements.push(pad2);
+	tixel.children.push(ball);
+	tixel.children.push(pad1);
+	tixel.children.push(pad2);
 
 	var ballDirectionX = 'to1';
 	var ballDirectionY = 'none';
@@ -61,34 +61,34 @@ function pong (controller, tixel) {
 	controller.events.on('touch.touch', function (e) {
 		e.buttonsPressedNew.forEach(function (position) {
 			if (position[0] === 0) {
-				pad1.origin[1] = position[1] - 1;
+				pad1.position[1] = position[1] - 1;
 			}
 			if (position[0] === 7) {
-				pad2.origin[1] = position[1] - 1;
+				pad2.position[1] = position[1] - 1;
 			}
 		});
 	});
 
 	controller.events.on('touch.update', function (e) {
 		if (ballDirectionX === 'to1') {
-			ball.origin[0]--;
+			ball.position[0]--;
 		} else {
-			ball.origin[0]++;
+			ball.position[0]++;
 		}
 		if (ballDirectionY === 'top') {
-			ball.origin[1]--;
+			ball.position[1]--;
 		}
 		if (ballDirectionY === 'down') {
-			ball.origin[1]++;
+			ball.position[1]++;
 		}
-		if (ball.origin[1] === 0) ballDirectionY = 'down';
-		if (ball.origin[1] === 5) ballDirectionY = 'up';
+		if (ball.position[1] === 0) ballDirectionY = 'down';
+		if (ball.position[1] === 5) ballDirectionY = 'up';
 
-		if (ball.origin[0] === 1) {
-				ballDirectionX = 'to2';
-			if (pad1.origin[1] === ball.origin[1] || pad1.origin[1] === ball.origin[1] - 1 || pad1.origin[1] === ball.origin[1] - 2) {
-				if (pad1.origin[1] === ball.origin[1] && ball.origin[1] !== 0) ballDirectionY = 'top';
-				if (pad1.origin[1] === ball.origin[1] - 2 && ball.origin[1] !== 5) ballDirectionY = 'down';
+		if (ball.position[0] === 1) {
+			ballDirectionX = 'to2';
+			if (pad1.position[1] === ball.position[1] || pad1.position[1] === ball.position[1] - 1 || pad1.position[1] === ball.position[1] - 2) {
+				if (pad1.position[1] === ball.position[1]) ballDirectionY = 'top';
+				if (pad1.position[1] === ball.position[1] - 2) ballDirectionY = 'down';
 				// touching pad1
 			} else {
 				ball.setSelectedPixels(redToGreen);
@@ -96,12 +96,14 @@ function pong (controller, tixel) {
 			}
 		}
 
-		if (ball.origin[0] === 6) {
-				ballDirectionX = 'to1';
-			if (pad2.origin[1] === ball.origin[1] || pad2.origin[1] === ball.origin[1] - 1 || pad2.origin[1] === ball.origin[1] - 2) {
-				// touching pad2
-				if (pad1.origin[1] === ball.origin[1] && ball.origin[1] !== 5) ballDirectionY = 'down';
-				if (pad1.origin[1] === ball.origin[1] - 2 && ball.origin[1] !== 0) ballDirectionY = 'top';
+		if (ball.position[0] === 6) {
+			ballDirectionX = 'to1';
+
+			if (pad2.position[1] === ball.position[1] || pad2.position[1] === ball.position[1] - 1 || pad2.position[1] === ball.origin[1] - 2) {
+				// touching pad1
+				if (pad1.position[1] === ball.position[1]) ballDirectionY = 'down';
+				if (pad1.position[1] === ball.position[1] - 2) ballDirectionY = 'top';
+
 			} else {
 				ball.setSelectedPixels(redToGreen);
 				pad2.setSelectedPixels(redToGreen);
