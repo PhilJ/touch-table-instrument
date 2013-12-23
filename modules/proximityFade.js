@@ -39,9 +39,9 @@ function colorFade (controller, tixel) {
 		console.log("Frames per second", frames);
 		frames = 0;
 	}, 1000);
-	controller.events.on('proximity.update', function (e) {
+	controller.events.on('touch.update', function (e) {
 		frames++;
-		var currentColor, newColor;
+		var newColor;
 		e.buttonsPressed.forEach(function (position) {
 			newColor = controller.proximity(position[0],position[1]);
 			tixel.valueCanvas.set(position[0],position[1],newColor);
